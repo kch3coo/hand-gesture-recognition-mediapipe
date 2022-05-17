@@ -1,4 +1,4 @@
-const el = document.querySelector(".mouse");
+const el = window.parent.document.querySelector(".mouse");
 
 function onMouseMove(e) {
   x = e.clientX;
