@@ -156,6 +156,10 @@ def gen_frames(app):
                 else:
                     point_history.append([0, 0])
                 
+                if hand_sign_id == 3:
+                    #Like gesture
+                    app.js.sendDanMu("我是你爹")
+
                 if hand_sign_id == 0 and isLeftHand:  # Mouse gesture
                     app.updateMousePos(relativeX, relativeY)
                 elif hand_sign_id == 4 and app.prev_gesture != 4:  # Click gesture
