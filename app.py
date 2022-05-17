@@ -25,7 +25,7 @@ class App():
         browser_height = self.js.window.innerHeight
         x = int(percentage_x * int(browser_width))
         y = int(percentage_y * int(browser_height))
-        self.js.document.getElementById("mouse").style.transform = "translate({x}px, {y}px)".format(x=x, y=y)
+        self.js.window.parent.document.getElementById("mouse").style.transform = "translate({x}px, {y}px)".format(x=x, y=y)
     
     def mouseClick(self, percentage_x, percentage_y):
         # Update the mouse position on the browser, convert the landmark location to be relative to the browser
@@ -33,9 +33,9 @@ class App():
         browser_height = self.js.window.innerHeight
         x = int(percentage_x * int(browser_width))
         y = int(percentage_y * int(browser_height))
-        self.js.document.getElementById("mouse").display = "none"
-        self.js.mouseClick(x, y)
-        self.js.document.getElementById("mouse").display = "content"
+        self.js.window.parent.document.getElementById("mouse").display = "none"
+        self.js.parent.mouseClick(x, y)
+        self.js.window.parent.document.getElementById("mouse").display = "content"
 '''
 for ip camera use - rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' 
 for local webcam use cv2.VideoCapture(0)
@@ -52,6 +52,10 @@ def video_feed():
 @app.route('/game2048')
 def game2048():
     return App.render(render_template('game2048.html'))
+
+@app.route('/snake')
+def snake():
+    return App.render(render_template('snake.html'))
 
 if __name__ == "__main__":
     app.run(debug=True)
