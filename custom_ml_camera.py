@@ -15,6 +15,7 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 import pyautogui
+pyautgui.PAUSE = 0.01
 
 
 def get_args():
@@ -149,10 +150,9 @@ def gen_frames(app):
 
                 relativeX = landmark_list[8][0] / image_width
                 relativeY = landmark_list[8][1] / image_height
-                browser_width = app.js.window.innerWidth
-                browser_height = app.js.window.innerHeight
-                x = int(relativeX * int(browser_width))
-                y = int(relativeY * int(browser_height))
+                width, height= pyautogui.size()
+                x = int(relativeX * int(width))
+                y = int(relativeY * int(height))
 
                 isLeftHand = handedness.classification[0].label[0] == 'L'
 
@@ -161,13 +161,10 @@ def gen_frames(app):
                 else:
                     point_history.append([0, 0])
                 
-                if hand_sign_id == 0 and isLeftHand:  # Mouse gesture
-                    app.updateMousePos(relativeX, relativeY)
-                    # pyautogui.moveTo(x, y, 0.2) 
+                if hand_sign_id == 0 and isLeftHand:  #     Mouse gesture
+                    pyautogui.moveTo(x, y, 0.2) 
                 elif hand_sign_id == 4 and app.prev_gesture != 4:  # Click gesture
                     #We use close gesture to simulate mouse click
-                    # app.mouseClick(relativeX, relativeY)
-
                     pyautogui.click(x, y) 
 
 
