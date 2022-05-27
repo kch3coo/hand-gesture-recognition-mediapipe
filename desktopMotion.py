@@ -16,7 +16,7 @@ from model import KeyPointClassifier
 from model import PointHistoryClassifier
 import pyautogui
 import pydirectinput
-
+pydirectinput.PAUSE=0.01
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -140,8 +140,8 @@ def main():
                 pre_processed_point_history_list = pre_process_point_history(
                     debug_image, point_history)
                 # Write to the dataset file
-                logging_csv(number, mode, pre_processed_landmark_list,
-                            pre_processed_point_history_list)
+                # logging_csv(number, mode, pre_processed_landmark_list,
+                #             pre_processed_point_history_list)
 
                 # Hand sign classification
                 hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
@@ -149,11 +149,13 @@ def main():
                  #get image size
                 image_width, image_height = debug_image.shape[1], debug_image.shape[0]
 
-                relativeX = landmark_list[1][0] / image_width
+                relativeX = landmark_list[1][0] / image_width 
                 relativeY = landmark_list[1][1] / image_height
                 width, height= pyautogui.size()
-                x = int(relativeX * int(width))
-                y = int(relativeY * int(height))
+                # print(pyautogui.size())
+                # print(relativeX, relativeY)
+                x = int((relativeX + 0.1) * int(width))
+                y = int((relativeY + 0.2)* int(height))
 
                 isLeftHand = handedness.classification[0].label[0] == 'L'
 
@@ -162,33 +164,38 @@ def main():
                 else:
                     point_history.append([0, 0])
 
-                if hand_sign_id == 0 and not isLeftHand:  #     Mouse gesture
-                    pyautogui.moveTo(x, y, duration=0.1, _pause=False)
-                elif hand_sign_id == 3 and prev_gesture != 4:  # Left Click gesture
-                    pyautogui.click()
-                elif hand_sign_id == 4 and prev_gesture != 5:  # Right Click gesture
-                    pyautogui.click(button='right')  
-                elif hand_sign_id == 2 and prev_gesture != 2:  # Press Q
-                    pydirectinput.press('q')
-                elif hand_sign_id == 5 and prev_gesture != 5:  # Press W
-                    pydirectinput.press('w')
-                elif hand_sign_id == 6 and prev_gesture != 6:  # Press E
-                    pydirectinput.press('e')
-                elif hand_sign_id == 7 and prev_gesture != 7:  # Press R
-                    pydirectinput.press('r')
+                if isLeftHand:
+                    if hand_sign_id == 2 and prev_gesture != 2:  # Press Q
+                        pydirectinput.press('q')
+                    elif hand_sign_id == 5 and prev_gesture != 5:  # Press W
+                        pydirectinput.press('w')
+                    elif hand_sign_id == 6 and prev_gesture != 6:  # Press E
+                        pydirectinput.press('e')
+                    elif hand_sign_id == 7 and prev_gesture != 7:  # Press R
+                        pydirectinput.press('r')
+
+                else: 
+                    if hand_sign_id == 0:  #     Mouse gesture
+                        pydirectinput.moveTo(x, y - 200, duration=0.1, _pause=False)
+                        pass
+                    elif hand_sign_id == 3 and prev_gesture != 4 :  # Left Click gesture
+                        pydirectinput.click()
+                    elif hand_sign_id == 4 and prev_gesture != 5:  # Right Click gesture
+                        pydirectinput.click(button='right') 
+
 
 
                 # Finger gesture classification
-                finger_gesture_id = 0
-                point_history_len = len(pre_processed_point_history_list)
-                if point_history_len == (history_length * 2):
-                    finger_gesture_id = point_history_classifier(
-                        pre_processed_point_history_list)
+                # finger_gesture_id = 0
+                # point_history_len = len(pre_processed_point_history_list)
+                # if point_history_len == (history_length * 2):
+                #     finger_gesture_id = point_history_classifier(
+                #         pre_processed_point_history_list)
 
                 # Calculates the gesture IDs in the latest detection
-                finger_gesture_history.append(finger_gesture_id)
-                most_common_fg_id = Counter(
-                    finger_gesture_history).most_common()
+                # finger_gesture_history.append(finger_gesture_id)
+                # most_common_fg_id = Counter(
+                #     finger_gesture_history).most_common()
 
                 # Drawing part
                 debug_image = draw_bounding_rect(use_brect, debug_image, brect)
@@ -198,7 +205,7 @@ def main():
                     brect,
                     handedness,
                     keypoint_classifier_labels[hand_sign_id],
-                    point_history_classifier_labels[most_common_fg_id[0][0]],
+                   "",
                 )
 
                 prev_gesture = hand_sign_id
